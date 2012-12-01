@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# script to be run from within vim.  Traverses the directory tree
+# to find a .tex file that sources the current buffer.
+# Stops at the home directory
+
 if [[ `echo $1 | grep -c tex$` == 1 ]]; then
    texfile="$1"
 else
