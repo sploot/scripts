@@ -4,7 +4,15 @@
 # to find a .tex file that sources the current buffer.
 # Stops at the home directory
 
-if [[ `echo $1 | grep -c tex$` == 1 ]]; then
+
+while getopts "o" opt; do
+   case $opt in
+      o) OPEN=1;;
+   esac
+   shift $((OPTIND-1))
+done
+
+if [[ `echo $1 | grep -c tex$` == 1 || `echo $1|grep -c pdf$` == 1 && $OPEN == 1 ]]; then
    texfile="$1"
 else
    echo "Not a latex file..."
@@ -15,9 +23,12 @@ basedir=`echo $texfile | sed -e 's/\(.*\/\).*/\1/'`
 if [[ `grep -c \documentclass $texfile` != 0 ]]; then
    cd $basedir
    noext=`echo $texfile|sed -e 's/\(.*\)\..*/\1/'`
-   pdflatex $texfile
-   if [[ $? == 0 ]]; then
-      rm ${noext}.{aux,log}
+   if [[ $OPEN == 1 ]]; then
+      pdf=`echo $texfile|sed -e 's/tex/pdf/'`
+      open $pdf
+   else
+      pdflatex -interaction nonstopmode $texfile
+#      rm ${noext}.{aux,log}
    fi
    exit 0
 elif [[ `echo $basedir | grep -ic /notes/` == 1 ]]; then
